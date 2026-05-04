@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Prompt Generator Pro</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="logo">
+            <div class="logo-icon">✨</div>
+            <span>AI Prompt Generator Pro</span>
+        </div>
+        <div class="mode-toggle" id="modeToggle">
+            <button class="mode-btn active" data-mode="image" id="btnModeImage">🖼️ Image to Prompt</button>
+            <button class="mode-btn" data-mode="video" id="btnModeVideo">🎬 Video to Prompt</button>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- MODE 1: Image to Prompt -->
+        <div id="modeImagePanel">
+            <div class="card">
+                <div class="card-title">
+                    <span class="icon icon-purple">🖼️</span> Upload Image for Analysis
+                </div>
+                <div class="upload-zone" id="imageUploadZone">
+                    <div class="upload-icon">📤</div>
+                    <h3>Click or Drag & Drop an Image</h3>
+                    <p>Supports JPG, PNG, WEBP, BMP — Max 20MB</p>
+                    <input type="file" id="imageInput" accept="image/*">
+                </div>
+                <div id="imagePreviewArea" style="text-align:center;"></div>
+                <div class="aspect-ratio-selector" id="aspectRatioSelector">
+                    <span style="color:var(--subtext);font-size:0.85rem;font-weight:500;margin-right:4px;">Aspect Ratio:</span>
+                    <button class="aspect-btn selected" data-ratio="1:1">1:1 Square</button>
+                    <button class="aspect-btn" data-ratio="3:2">3:2</button>
+                    <button class="aspect-btn" data-ratio="4:3">4:3</button>
+                    <button class="aspect-btn" data-ratio="16:9">16:9</button>
+                    <button class="aspect-btn" data-ratio="21:9">21:9 Cinema</button>
+                    <button class="aspect-btn" data-ratio="9:16">9:16 Vertical</button>
+                    <button class="aspect-btn" data-ratio="2:3">2:3</button>
+                    <button class="aspect-btn" data-ratio="3:4">3:4</button>
+                </div>
+                <div style="margin-top:18px;display:flex;gap:12px;flex-wrap:wrap;">
+                    <button class="btn btn-primary" id="btnAnalyzeImage" disabled>
+                        🔍 Analyze & Generate Prompt
+                    </button>
+                    <button class="btn btn-outline btn-sm" id="btnClearImage" style="display:none;">
+                        ✕ Clear
+                    </button>
+                </div>
+            </div>
+
+            <!-- Results Panel -->
+            <div id="imageResults" style="display:none;">
+                <div class="card" id="englishPromptCard">
+                    <div class="card-title">
+                        <span class="icon icon-gold">📝</span> English Prompt
+                    </div>
+                    <div class="result-block" style="position:relative;">
+                        <button class="copy-btn-float" data-target="englishPromptText">📋 Copy</button>
+                        <pre id="englishPromptText"></pre>
+                        <span class="copied-feedback" id="copiedEnglish">✓ Copied!</span>
+                    </div>
+                </div>
+                <div class="card" id="jsonOutputCard">
+                    <div class="card-title">
+                        <span class="icon icon-teal">{ }</span> JSON Output
+                        <button class="btn btn-copy btn-sm" style="margin-left:auto;" data-target="jsonOutputText">📋 Copy JSON</button>
+                        <button class="btn btn-export btn-sm" data-target="jsonOutputText" data-download="prompt_analysis.json">💾 Download</button>
+                    </div>
+                    <div class="result-block">
+                        <pre id="jsonOutputText"></pre>
+                        <span class="copied-feedback" id="copiedJSON">✓ Copied!</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MODE 2: Video to Prompt -->
+        <div id="modeVideoPanel" style="display:none;">
+            <div class="card">
+                <div class="card-title">
+                    <span class="icon icon-teal">🎬</span> Upload Video — Segmented Cinematic Mode
+                </div>
+                <div class="upload-zone" id="videoUploadZone">
+                    <div class="upload-icon">🎥</div>
+                    <h3>Click or Drag & Drop a Video</h3>
+                    <p>Supports MP4, MOV, WEBM — Max 100MB</p>
+                    <input type="file" id="videoInput" accept="video/*">
+                </div>
+                <div id="videoPreviewArea" style="text-align:center;"></div>
+                <div class="settings-row">
+                    <label for="segmentCount">Segments:</label>
+                    <select id="segmentCount">
+                        <option value="3">3 scenes</option>
+                        <option value="4">4 scenes</option>
+                        <option value="5" selected>5 scenes</option>
+                        <option value="6">6 scenes</option>
+                        <option value="7">7 scenes</option>
+                        <option value="8">8 scenes</option>
+                    </select>
+                    <label for="videoAspectRatio">Aspect Ratio:</label>
+                    <select id="videoAspectRatio">
+                        <option value="16:9" selected>16:9</option>
+                        <option value="21:9">21:9 Cinema</option>
+                        <option value="1:1">1:1 Square</option>
+                        <option value="4:3">4:3</option>
+                        <option value="9:16">9:16 Vertical</option>
+                    </select>
+                </div>
+                <div style="margin-top:18px;display:flex;gap:12px;flex-wrap:wrap;">
+                    <button class="btn btn-primary" id="btnAnalyzeVideo" disabled>
+                        🎞️ Analyze & Generate Scene Prompts
+                    </button>
+                    <button class="btn btn-outline btn-sm" id="btnClearVideo" style="display:none;">
+                        ✕ Clear
+                    </button>
+                </div>
+            </div>
+            <div id="videoLoadingCard" class="card" style="display:none;text-align:center;">
+                <div class="spinner"></div>
+                <span style="margin-left:12px;color:var(--subtext);">Extracting frames & analyzing scenes...</span>
+                <p style="font-size:0.8rem;color:var(--subtext);margin-top:8px;" id="videoProgressText"></p>
+            </div>
+            <div id="videoResults" style="display:none;">
+                <div class="card">
+                    <div class="card-title">
+                        <span class="icon icon-gold">🎬</span> Cinematic Scene Sequence
+                        <button class="btn btn-copy btn-sm" style="margin-left:auto;" id="btnCopyAllScenes">📋 Copy All Scenes</button>
+                    </div>
+                    <div class="segments-grid" id="segmentsGrid"></div>
+                </div>
+                <div class="card" id="videoJsonCard">
+                    <div class="card-title">
+                        <span class="icon icon-teal">{ }</span> Full JSON Export
+                        <button class="btn btn-export btn-sm" data-target="videoJsonText" data-download="video_prompts.json">💾 Download JSON</button>
+                    </div>
+                    <div class="result-block">
+                        <pre id="videoJsonText"></pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast"></div>
+
+    <script src="js/script.js"></script>
+</body>
+</html>
